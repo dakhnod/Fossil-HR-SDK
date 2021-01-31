@@ -113,7 +113,15 @@ The object's type-field contains the event name:
     - what
     
 - system_state_update
-    - would love to know myself, seems to be broadcastet on apps start
+    - gets broadcastet whenever an app is opened or closed from the launcher
+    - contains the following fields:
+        - de: boolean indicating if this events has anything to do with receiving app
+        - ze: old, exited state
+        - le: new, entered state
+    - states can have the following values:
+        - background: app is running, but in background, e.g. not shown
+        - hidden: app is being overlaid by notification or similar
+        - visible: app is in foreground
     
 ## Api functions
 
@@ -239,4 +247,4 @@ Here are the so far known types:
         - wtf
 
 ## Example
-// TODO
+I am really trying to provide one, but it keeps bricking my watch...
