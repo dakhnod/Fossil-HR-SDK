@@ -79,7 +79,8 @@ class Unpacker:
 
         identifier = files['code'][0]['filename']
         app_meta = {
-            'version': '%i.%i.%i.%i' % tuple(app_version)
+            'version': '%i.%i.%i.%i' % tuple(app_version),
+            'identifier': identifier
         }
 
         try:
