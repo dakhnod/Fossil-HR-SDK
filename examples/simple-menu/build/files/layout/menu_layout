@@ -1,0 +1,42 @@
+[
+    {
+        "id": 0,
+        "type": "wapp_template",
+        "header_icon": "icHome",
+        "title_icon": "icStopwatch",
+        "title_string": "#header",
+        "is_header_selected": "#is_header_selected",
+        "dimension": {
+            "type": "rigid",
+            "width": 240,
+            "height": 240
+        },
+        "placement": {
+            "type": "absolute",
+            "left": 0,
+            "top": 0
+        },
+        "visible": true,
+        "inversion": false
+    },
+    {
+        "id": 1,
+        "parent_id": 0,
+        "type": "option_menu",
+        "options": "#options",
+        "option_selected": "#selected_option",
+        "is_translate": false,
+        "dimension": {
+            "type": "rigid",
+            "width": 240,
+            "height": 66
+        },
+        "placement": {
+            "type": "absolute",
+            "left": 0,
+            "top": 150
+        },
+        "visible": true,
+        "inversion": false
+    }
+]
