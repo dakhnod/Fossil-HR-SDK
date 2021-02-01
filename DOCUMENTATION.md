@@ -134,6 +134,12 @@ parameters:
 - timeout (probably)
 - some boolean parameter (no clue)
 
+### stop_req_timeout(something, node_name)
+stop timer which triggers timeout for requested info using `req_data`
+
+### is_this_query_expired()
+probably check data request is expired
+
 ### start_timer()
 starts a timer with the given parameters:
 - node_name (again, this.node_name)
@@ -145,6 +151,12 @@ parameters:
 - node_name
 - timer id (as defined in manifest)
 
+### parseInt(arg)
+dunno, might not even be a function
+
+### save_node_persist(persist_data)
+persistenly save given data. Dunno about the format, maybe just any arbitary object.
+
 ### localization_snprintf()
 translates the input according to the installed translation file.
 Very similar to snprintf in c.
@@ -152,6 +164,16 @@ Very similar to snprintf in c.
 parameters:
 - format string
 - parameters
+
+### enable_time_telling()
+dunno what this enables, but returns an object containing the hand angles for displaying the time
+
+### disable_time_telling()
+disables something
+
+### get_common()
+get common data, content unknown yet
+also, seems undefined in my test cases
 
 ### now()
 returns the current time in milliseconds.
