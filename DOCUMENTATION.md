@@ -35,6 +35,7 @@ jerry-snapshot generate -f '' code.js -o code
 ```
 `code` is then executed on the watch and returns an app object.
 This object defines the app's meta information and callbacks.
+It is mandatory to use JerryScript v2.1.0 as of firmware `DN1.0.2.19r.v7`.
 
 ## Code structure
 the compiled snapshot need to return an object containing a few fields:
@@ -77,18 +78,9 @@ The object's type-field contains the event name:
     - probably indicates hand movement to show the current time every few seconds
     
 - common_update
-    - contains common data such as heart rate info, time info, wear state info. Can contain the following fields:
-        - hr_bpm
-        - hr_bpm_resting
-        - hr_bpm_peak
-        - music_playback_state
-        - day
-        - date
-        - month
-        - year
-        - hour
-        - minute
-        - time_zone_loca
+contains common data such as heart rate info, time info, wear state info. 
+For a list of possible fields check the `common` section
+
     
 - timer_expired
     - indicates an expired time, check each timer with `is_this_timer_expired`
@@ -173,10 +165,57 @@ disables something
 
 ### get_common()
 get common data, content unknown yet
-also, seems undefined in my test cases
+also, seems undefined in my test cases.
+
+To access common data, just use the global `common`-object.
+```
+common['hour']
+```
+Should contain these fields:
+- R
+- settings
+- unit_setting
+- daily_goal
+- firmware_version
+- serial_number
+- default_theme
+- hand_hour
+- hand_minute
+- battery_soc
+- battery_voltage
+- charge_status
+- date
+- day
+- month
+- year
+- offset_unix_time_change
+- active_minutes
+- total_sleep
+- step_increase
+- time_zone_local
+- hour
+- minute
+- bluetooth_status
+- app_status
+- chance_of_rain
+- hr_bpm
+- step_count
+- calories
+- distance
+- weatherInfo
+- music_playback_state
+- device_offwrist
+- ringMyPhone
+- pending_config_verify_result
+- notification_reply_mask
+- hr_bpm_resting
+- hr_bpm_peak
 
 ### now()
 returns the current time in milliseconds.
+
+### is_this_timer_expired(event, node_name, timer_name)
+check if a timer is expired based on a `timer_expired`-event.
 
 ### move hands
 to move the watch hands the reponse object passed to `handler` needs to be used.
@@ -202,6 +241,65 @@ response.draw[this.node_name] = {
 }
 ```
 the keys in `layout_info` (besides json_file) correspond to placeholders set in the layout.
+
+### send generic event
+to send a generic event, set the response.i to an array containing the events
+```
+response.i = [
+    {
+        // this will trigger screen illumination for a few secs
+        'type': 'double_tap',
+        'class': 'user'
+    },
+    {
+        // this will move the hands 360° when showing the time
+        'type': 'flick_away',
+        'class': 'user'
+    }
+]
+```
+
+### play a notification
+to play a notification, the proper event needs to be fired
+```
+response.i = [
+            {
+                'type': 'urgent_notification',
+                'info': {
+                    'title': localization_snprintf('%s', 'Brr Brr'),
+                    'app_name': this.package_name,
+                    'icon_name': 'icTimer',
+                    'Re': 60, // timeout in secs for notification
+                    'vibe': {
+                        'type': 'timer',
+                        'Te': 1500,
+                        'Ie': 6000
+                    },
+                    'exit_event': {
+                        'type': 'timer_dismiss'
+                    },
+                    'actions': [
+                        {
+                            'Ke': localization_snprintf('%s', 'Dismiss'),
+                            'event': {
+                                'type': 'timer_dismiss',
+                                'param1': 'value1'
+                            }
+                        },
+                        {
+                            'Ke': localization_snprintf('%s', 'Repeat'),
+                            'event': {
+                                'type': 'timer_restart',
+                                'param1': 'value1',
+                                'param2': 'value2'
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+```
+If a menu option within the notification with an event defined is selected, that event and the parameters will be fired.
 
 ## State machine
 the state machine (state_machine class) provides an api to switch to different states.
@@ -269,4 +367,6 @@ Here are the so far known types:
         - wtf
 
 ## Example
-I am really trying to provide one, but it keeps bricking my watch...
+Examples can be found in the examples folder.
+### simple-menu
+this example show a basic menu with a few options and handles button events to scroll through the menu.
