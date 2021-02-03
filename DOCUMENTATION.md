@@ -12,7 +12,25 @@
 - Example
 
 ## How to use the SDK
-just don't, yet
+To use the SDK a few conditions have to be met
+- JerryScript v2.1.0 needs to be installed
+- jerry-snapshot needs to be in $PATH
+- jq needs to be installed and executable
+- for pushing and installing via Makefile:
+    - adb needs to be installed
+    - if phone supports adb over wifi, `make connect` can be used after adjusting the Makefile
+    - Gadgetbridge needs to be running and connected to the watch. Authentication is not needed.
+    - Gadgetbridge needs to have read access to the sd card. Android 11 makes that a bit harder
+    
+- If the project is an example or derived from one, build/app.json needs to be edited to contain the desired appo id
+- then, in the folder where the Makefile lies, `make` can be run. That should
+    - `make compile`
+    - `make pack`
+    - `make push`
+    - `make install`
+    
+    all at once.
+- Gadgetbridge should then push the app to the watch. It should be automatically installed.
 
 ## HR app structure
 each app package is an archive of files.
@@ -367,6 +385,6 @@ Here are the so far known types:
         - wtf
 
 ## Example
-Examples can be found in the examples folder.
+Examples can be found in the examples folder. Too learn about running examples theck the `How to use the SDK` section.
 ### simple-menu
 this example show a basic menu with a few options and handles button events to scroll through the menu.
