@@ -164,15 +164,18 @@ class Disassembler:
 
             if only_scan_function_names:
                 if name == 'CBC_INITIALIZE_VAR':
-                    referenced_func_name = literals[code[index + 1] - function['register_range_end']]['value']
-                    referenced_func_address = literals[code[index + 2] - function['register_range_end']]['address'] + self.function_start
-                    for function in functions:
-                        if referenced_func_address == function['start']:
-                            try:
-                                function['name'] = referenced_func_name.decode('ascii')
-                            except:
-                                function['name'] = 'cannot decode'
-                            break
+                    try:
+                        referenced_func_name = literals[code[index + 1] - function['register_range_end']]['value']
+                        referenced_func_address = literals[code[index + 2] - function['register_range_end']]['address'] + self.function_start
+                        for function in functions:
+                            if referenced_func_address == function['start']:
+                                try:
+                                    function['name'] = referenced_func_name.decode('ascii')
+                                except:
+                                    function['name'] = 'cannot decode'
+                                break
+                    except:
+                        print('error decoding reference')
                 index = index + 1 + opcode_data['literal_args'] + opcode_data['byte_args'] + opcode_data['branch_args']
                 continue
 
