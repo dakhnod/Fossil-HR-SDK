@@ -2,7 +2,7 @@ identifier := $(shell cat build/app.json | jq -r '.identifier')
 
 source_file = app.js
 snapshot_file = build/files/code/${identifier}
-tools_dir = ../../WatchSDK/tools/
+tools_dir = ../../tools/
 package_file = ${identifier}.wapp
 package_path = build/${package_file}
 
