@@ -1,18 +1,19 @@
 from PIL import Image
 import sys
 import os.path
+import getopt
 
 class Decompresser:
-    def __init__(self, image_path):
-        self.image_path = image_path
+    def __init__(self):
+        pass
 
-    def decompress(self):
+    def decompress(self, input_file_path, output_file_path):
         image_pixels = []
 
         if not os.path.isfile(sys.argv[1]):
             raise Exception('first parameter needs to be compressed image file')
 
-        with open(self.image_path, 'rb') as image_file:
+        with open(input_file_path, 'rb') as image_file:
             width = image_file.read(1)[0]
             height = image_file.read(1)[0]
 
@@ -37,10 +38,19 @@ class Decompresser:
                 print('faulty image file, missing 0xFF 0xFF at end')
 
         image = Image.frombuffer('RGBA', (width, height), bytearray(image_pixels))
-        image.save(sys.argv[2], 'PNG')
+        image.save(output_file_path, 'PNG')
 
 
 if __name__ == '__main__':
-    decompresser = Decompresser(sys.argv[1])
-    decompresser.decompress()
+    decompresser = Decompresser()
+    input_file_path = None
+    output_file_path = None
+    args, remainder = getopt.getopt(sys.argv[1], 'i:o:', ['input=', 'output='])
+    for key, value in args:
+        if key in ['-i', '--input']:
+            input_file_path = value
+        elif key in ['-o', '--output']:
+            output_file_path = value
+
+    decompresser.decompress(input_file_path, output_file_path)
 

@@ -2,22 +2,22 @@ import sys
 import os
 import json
 import crc32c
+import getopt
 
 class Packer:
-    def __init__(self, app_dir):
-        self.app_dir = app_dir
+    def __init__(self):
         self.file_block = bytearray()
 
     def put_int(self, content, length=4):
         self.file_block.extend(content.to_bytes(length, 'little'))
 
-    def pack(self, output_file_path=None):
+    def pack(self, input_dir_path, output_file_path):
         start_path = os.getcwd()
 
-        if not os.path.isdir(self.app_dir):
-            print('cannot find dir %s' % self.app_dir)
+        if not os.path.isdir(input_dir_path):
+            print('cannot find dir %s' % input_dir_path)
             exit()
-        os.chdir(self.app_dir)
+        os.chdir(input_dir_path)
 
         with open('app.json', 'r') as json_file:
             app_meta = json.load(json_file)
@@ -104,8 +104,16 @@ class Packer:
 
 
 def main():
-    packer = Packer(sys.argv[1])
-    packer.pack(sys.argv[2])
+    packer = Packer()
+    input_dir_path = None
+    output_file_path = None
+    args, remainder = getopt.getopt(sys.argv[1:], 'i:o:', ['input=', 'output='])
+    for key, value in args:
+        if key in ['-i', '--input']:
+            input_dir_path = value
+        elif key in ['-o', '--output']:
+            output_file_path = value
+    packer.pack(input_dir_path, output_file_path)
 
 
 if __name__ == '__main__':

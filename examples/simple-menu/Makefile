@@ -18,7 +18,7 @@ compile:
 	jerry-snapshot generate -f '' ${source_file} -o ${snapshot_file}
 
 pack:
-	python3 ${tools_dir}pack.py build/ ${package_path}
+	python3 ${tools_dir}pack.py -i build/ -o ${package_path}
 
 push:
 	adb push ${package_path} ${adb_target_dir}
