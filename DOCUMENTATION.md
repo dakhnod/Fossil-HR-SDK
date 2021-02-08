@@ -236,7 +236,10 @@ returns the current time in milliseconds.
 check if a timer is expired based on a `timer_expired`-event.
 
 ### move hands
-to move the watch hands the reponse object passed to `handler` needs to be used.
+the response abstraction layer can be used for this.
+Just call `response = wrap_response(response)`, on the response object, then you can use
+`response.move_hands(angle_hour, angle_minute, relative)`.
+Also, to move the watch hands the reponse object passed to `handler` needs to be used.
 ```
 response.move = {
     'h': angle,
@@ -246,7 +249,10 @@ response.move = {
 ```
 
 ### draw to screen
-to draw to the screen a layout system is used. I am unsure whether there is raw access to the screen.
+the response abstraction layer can be used for this.
+Just call `response = wrap_response(response)`, on the response object, then you can use
+`response.draw_screen(node_name, full_refresh, layout_info)`.
+Also, to draw to the screen a layout system is used. I am unsure whether there is raw access to the screen.
 Once again, the response object is used.
 ```
 response.draw = {}
