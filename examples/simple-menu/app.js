@@ -71,80 +71,94 @@ return {
                 layout_info: layout_info
             }
         }
+        response.send_user_class_event = function (event_type) {
+            response.send_generic_event({
+                type: event_type,
+                class: 'user'
+            })
+        }
+        response.send_generic_event = function (event_object) {
+            if(response.i == undefined) response.i = []
+            response.i.push(event_object)
+        }
         return response
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
     },
-    init: function () { // function 8
-        this.state_machine = new state_machine(this,
+    handle_global_event: function (self, state_machine, event, response) {
+        self.log("event type: " + event.type)
+        self.log(event)
+        event = self.decode_system_state_update_event(event)
+        response = self.wrap_response
 
-            function (self, state_machine, event, response) {
-                self.log("event type: " + event.type)
-                self.log(event)
-                event = self.decode_system_state_update_event(event)
-                response = self.wrap_response
+        if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
+            state_machine.d('menu')
+        } else if (event.type === 'middle_hold') {
+            response.go_back(true)
+        }
+    },
+    handle_state_specific_event: function (state, state_phase) {
+        switch (state) {
+            case 'background': {
+                if (state_phase == 'during') {
+                    return function (self, state_machine, event, response) {
 
-                // if (state_machine.n === 'background') {
-                if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
-                    state_machine.d('menu')
-                } else if (event.type === 'middle_hold') {
-                    response.go_back(true)
-                }
-            },
-
-            function (state, state_phase) {
-                switch (state) {
-                    case 'background': {
-                        if (state_phase == 'during') {
-                            return function (self, state_machine, event, response) {
-
-                            }
-                        }
-                        break;
                     }
-                    case 'menu': {
-                        if (state_phase == 'entry') {
-                            return function (self, response) {
-                                response = self.wrap_response(response)
-                                response.move_hands(270, 90, false)
+                }
+                break;
+            }
+            case 'menu': {
+                if (state_phase == 'entry') {
+                    return function (self, response) {
+                        response = self.wrap_response(response)
+                        response.move_hands(270, 90, false)
+                        self.draw_menu(response)
+                    }
+                }
+                if (state_phase == 'during') {
+                    return function (self, state_machine, event, response) {
+                        response = self.wrap_response(response)
+                        if (event.type === 'middle_short_press_release') {
+                            if (self.selected_option === -1) {
+                                response.go_home(true)
+                                return
+                            } else {
+                                self.header_text = "selected " + self.options[self.selected_option];
+                                self.draw_menu(response)
+                                response.send_user_class_event('double_tap')
+                            }
+                        } else if (event.type === 'top_short_press_release') {
+                            if (self.selected_option > -1) {
+                                self.selected_option--
+                                self.draw_menu(response)
+                            }
+                        } else if (event.type === 'bottom_short_press_release') {
+                            if (self.selected_option < 2) {
+                                self.selected_option++
                                 self.draw_menu(response)
                             }
                         }
-                        if (state_phase == 'during') {
-                            return function (self, state_machine, event, response) {
-                                response = self.wrap_response(response)
-                                if (event.type === 'middle_short_press_release') {
-                                    if (self.selected_option === -1) {
-                                        response.go_home(true)
-                                        return
-                                    } else {
-                                        self.header_text = "selected " + self.options[self.selected_option];
-                                        self.draw_menu(response)
-                                    }
-                                } else if (event.type === 'top_short_press_release') {
-                                    if (self.selected_option > -1) {
-                                        self.selected_option--
-                                        self.draw_menu(response)
-                                    }
-                                } else if (event.type === 'bottom_short_press_release') {
-                                    if (self.selected_option < 2) {
-                                        self.selected_option++
-                                        self.draw_menu(response)
-                                    }
-                                }
-                            }
-                        }
-                        if (state_phase == 'exit') {
-                            return function (arg, arg2) { // function 14, 20
-
-                            }
-                        }
-                        break;
                     }
                 }
-                return
-            }, undefined, 'background')
+                if (state_phase == 'exit') {
+                    return function (arg, arg2) { // function 14, 20
+
+                    }
+                }
+                break;
+            }
+        }
+        return
+    },
+    init: function () { // function 8
+        this.state_machine = new state_machine(
+            this,
+            this.handle_global_event,
+            this.handle_state_specific_event,
+            undefined,
+            'background'
+        )
     }
 }
 

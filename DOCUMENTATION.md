@@ -267,6 +267,23 @@ response.draw[this.node_name] = {
 the keys in `layout_info` (besides json_file) correspond to placeholders set in the layout.
 
 ### send generic event
+
+the response abstraction layer can be used for this.
+Just call `response = wrap_response(response)`, on the response object, then you can use
+`response.draw_screen(node_name, full_refresh, layout_info)`.
+For instance, 
+```
+response.send_user_class_event('double_tap')
+``` 
+or
+```
+response.send_generic_event({
+    type: 'double_tap',
+    class: 'user'
+})
+```
+would light up the screen for a few seconds.
+
 to send a generic event, set the response.i to an array containing the events
 ```
 response.i = [
