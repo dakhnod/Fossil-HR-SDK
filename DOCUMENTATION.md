@@ -284,7 +284,7 @@ response.send_generic_event({
 ```
 would light up the screen for a few seconds.
 
-to send a generic event, set the response.i to an array containing the events
+To send a generic event without the layer, set the response.i to an array containing the events
 ```
 response.i = [
     {
