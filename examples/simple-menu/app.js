@@ -90,7 +90,7 @@ return {
         self.log("event type: " + event.type)
         self.log(event)
         event = self.decode_system_state_update_event(event)
-        response = self.wrap_response
+        self.wrap_response(response)
 
         if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
             state_machine.d('menu')
@@ -111,14 +111,12 @@ return {
             case 'menu': {
                 if (state_phase == 'entry') {
                     return function (self, response) {
-                        response = self.wrap_response(response)
                         response.move_hands(270, 90, false)
                         self.draw_menu(response)
                     }
                 }
                 if (state_phase == 'during') {
                     return function (self, state_machine, event, response) {
-                        response = self.wrap_response(response)
                         if (event.type === 'middle_short_press_release') {
                             if (self.selected_option === -1) {
                                 response.go_home(true)
