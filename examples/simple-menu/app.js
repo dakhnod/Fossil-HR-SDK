@@ -33,14 +33,12 @@ return {
         )
     },
     decode_system_state_update_event: function (system_state_update_event) {
-        if (system_state_update_event.type !== 'system_state_update') return system_state_update_event;
-
-        return {
-            type: system_state_update_event.type,
-            concerns_this_app: system_state_update_event.de,
-            old_state: system_state_update_event.ze,
-            new_state: system_state_update_event.le
+        if (system_state_update_event.type === 'system_state_update') {
+            system_state_update_event.concerns_this_app = system_state_update_event.de
+            system_state_update_event.old_state = system_state_update_event.ze
+            system_state_update_event.new_state = system_state_update_event.le
         }
+        return system_state_update_event
     },
     wrap_response: function (response) {
         response.move_hands = function (degrees_hour, degrees_minute, relative) {
@@ -78,7 +76,7 @@ return {
             })
         }
         response.send_generic_event = function (event_object) {
-            if(response.i == undefined) response.i = []
+            if (response.i == undefined) response.i = []
             response.i.push(event_object)
         }
         return response
@@ -124,7 +122,6 @@ return {
                             } else {
                                 self.header_text = "selected " + self.options[self.selected_option];
                                 self.draw_menu(response)
-                                response.send_user_class_event('double_tap')
                             }
                         } else if (event.type === 'top_short_press_release') {
                             if (self.selected_option > -1) {
