@@ -16,8 +16,9 @@ return {
     last_displayed_hour: 0,
     title_refers_to_timer: false,
 
-    handler: function (arg1, arg2) { // function 1
-        this.state_machine._(arg1, arg2)
+    handler: function (event, response) { // function 1
+        this.wrap_response(response)
+        this.state_machine._(event, response)
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
@@ -230,7 +231,6 @@ return {
     },
     handle_global_event: function (self, state_machine, event, response) {
         event = self.decode_system_state_update_event(event)
-        self.wrap_response(response)
 
         if (event.type === 'system_state_update' && event.concerns_this_app === true) {
             if (event.new_state === 'visible') {

@@ -35,9 +35,9 @@ return {
 
     moving_direction: 1,
 
-    handler: function (arg1, arg2) { // function 1
-        this.wrap_response(arg2)
-        this.state_machine._(arg1, arg2)
+    handler: function (event, response) { // function 1
+        this.wrap_response(response)
+        this.state_machine._(event, response)
     },
     log: function(object){
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
