@@ -36,6 +36,7 @@ return {
     moving_direction: 1,
 
     handler: function (arg1, arg2) { // function 1
+        this.wrap_response(arg2)
         this.state_machine._(arg1, arg2)
     },
     log: function(object){
@@ -89,14 +90,11 @@ return {
             layout_info['y_' + layout_indices] = this.snake_nodes[i].y
             layout_info['visible_' + layout_indices] = true
         }
-
-        response.draw = {
-            update_type: 'du4' // gc4 would refresh the whole screen
-        }
-        response.draw[this.node_name] = {
-            layout_function: 'layout_parser_json',
-            layout_info: layout_info
-        }
+        response.draw_screen(
+            this.node_name,
+            true,
+            layout_info
+        )
     },
     decode_system_state_update_event: function(system_state_update_event){
         if(system_state_update_event.type !== 'system_state_update') return system_state_update_event;
@@ -107,6 +105,47 @@ return {
             old_state: system_state_update_event.ze,
             new_state: system_state_update_event.le
         }
+    },
+    wrap_response: function (response) {
+        response.move_hands = function (degrees_hour, degrees_minute, relative) {
+            response.move = {
+                h: degrees_hour,
+                m: degrees_minute,
+                is_relative: relative
+            }
+        }
+        response.go_back = function (kill_app) {
+            response.action = {
+                type: 'go_back',
+                Se: kill_app
+            }
+        }
+        response.go_home = function (kill_app) {
+            response.action = {
+                type: 'go_home',
+                Se: kill_app
+            }
+        }
+        response.draw_screen = function (node_name, full_update, layout_info) {
+            response.draw = {
+                update_type: full_update ? 'du4' : 'gu4'
+            }
+            response.draw[node_name] = {
+                layout_function: 'layout_parser_json',
+                layout_info: layout_info
+            }
+        }
+        response.send_user_class_event = function (event_type) {
+            response.send_generic_event({
+                type: event_type,
+                class: 'user'
+            })
+        }
+        response.send_generic_event = function (event_object) {
+            if (response.i == undefined) response.i = []
+            response.i.push(event_object)
+        }
+        return response
     },
     'log': function(object){
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
@@ -121,10 +160,7 @@ return {
                 if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
                     state_machine.d('game_main')
                 }else if(event.type === 'middle_hold') {
-                    response.action = {
-                        type: 'go_back',
-                        Se: true // delete memory
-                    }
+                    response.go_back(true)
                 }
             },
 
@@ -141,11 +177,7 @@ return {
                     case 'game_main': {
                         if (state_phase == 'entry') {
                             return function (self, response) {
-                                response.move = {
-                                    'h': 0,
-                                    'm': 0,
-                                    'is_relative': false
-                                }
+                                response.move_hands(0, 0, false)
                                 self.draw_game(response)
                                 start_timer(self.node_name, 'game_tick', self.tick_period)
                             }
@@ -169,10 +201,7 @@ return {
                         }
                         if (state_phase == 'exit') {
                             return function (event, response) { // function 14, 20
-                                response.action = {
-                                    'type': 'go_back',
-                                    'Se': true // delete memory
-                                }
+                                response.go_back(true)
                                 stop_timer(self.node_name, 'game_tick')
                             }
                         }
