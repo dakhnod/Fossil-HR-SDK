@@ -1,0 +1,42 @@
+[
+    {
+        "id": 0,
+        "type": "wapp_template",
+        "header_icon": "icHome",
+        "title_icon": "#title_icon",
+        "title_string": "#title",
+        "is_header_selected": "false",
+        "dimension": {
+            "type": "rigid",
+            "width": 240,
+            "height": 240
+        },
+        "placement": {
+            "type": "absolute",
+            "left": 0,
+            "top": 0
+        },
+        "visible": true,
+        "inversion": false
+    },
+    {
+        "id": 1,
+        "parent_id": 0,
+        "type": "option_menu",
+        "options": "#laps",
+        "option_selected": -1,
+        "is_translate": false,
+        "dimension": {
+            "type": "rigid",
+            "width": 240,
+            "height": 66
+        },
+        "placement": {
+            "type": "absolute",
+            "left": 0,
+            "top": 150
+        },
+        "visible": true,
+        "inversion": false
+    }
+]
