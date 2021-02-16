@@ -34,5 +34,5 @@ install:
 	--ez EXTRA_GENERATE_FILE_HEADER false
 
 clean:
-	rm build/files/code/*
-	rm build/*.wapp
+	rm -f build/files/code/*
+	rm -f build/*.wapp
