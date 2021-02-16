@@ -1,0 +1,188 @@
+[
+    {
+        "id": 0,
+        "type": "container",
+        "dimension": {
+          "type": "rigid",
+          "width": 240,
+          "height": 240
+        },
+        "placement": {
+          "type": "absolute",
+          "left": 0,
+          "top": 0
+        },
+        "visible": true,
+        "inversion": false
+    },
+    {
+        "id": 1,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#food_x",
+            "top": "#food_y"
+        },
+        "visible": true,
+        "inversion": false
+    },
+    {
+        "id": 2,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_2",
+            "top": "#y_2"
+        },
+        "visible": "#visible_2",
+        "inversion": false
+    },
+    {
+        "id": 3,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_3",
+            "top": "#y_3"
+        },
+        "visible": "#visible_3",
+        "inversion": false
+    },
+    {
+        "id": 4,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_4",
+            "top": "#y_4"
+        },
+        "visible": "#visible_4",
+        "inversion": false
+    },
+    {
+        "id": 5,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_5",
+            "top": "#y_5"
+        },
+        "visible": "#visible_5",
+        "inversion": false
+    },
+    {
+        "id": 6,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_6",
+            "top": "#y_6"
+        },
+        "visible": "#visible_6",
+        "inversion": false
+    },
+    {
+        "id": 7,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_7",
+            "top": "#y_7"
+        },
+        "visible": "#visible_7",
+        "inversion": false
+    },
+    {
+        "id": 8,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_8",
+            "top": "#y_8"
+        },
+        "visible": "#visible_8",
+        "inversion": false
+    },
+    {
+        "id": 9,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_9",
+            "top": "#y_9"
+        },
+        "visible": "#visible_9",
+        "inversion": false
+    },
+    {
+        "id": 10,
+        "parent_id": 0,
+        "type": "solid",
+        "color": 3,
+        "dimension": {
+            "width": 10,
+            "height": 10
+        },
+        "placement": {
+            "type": "absolute",
+            "left": "#x_10",
+            "top": "#y_10"
+        },
+        "visible": "#visible_10",
+        "inversion": false
+    }
+]
