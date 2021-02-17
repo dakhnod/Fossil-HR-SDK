@@ -1,3 +1,22 @@
 # Fossil-HR-SDK
 
-## this is a collection of tools to create apps that run natively on the the Fossil HR smartwatches.
+this is a collection of tools to create apps that run natively on the the Fossil HR smartwatches.
+
+## Prerequisites
+- the thing probably won't run under windows natively. Subsystem works though.
+- jerryscript and jerryscript-snapshot need to be installed and in the $PATH, both v2.1.0
+- make needs to be installed
+- adb needs to be working and connected to your phone
+- Gadgetbridge needs to run on the phone and be connected to the watch (not authentication needed)
+- some more stuff, dunno what yet. You and me can complete this together...
+
+## Usage
+- cd into one of the examples containing a Makefile
+- `make` will build and install an example on the watch through GB (timer will override the default stopwatchApp)
+- never change any example code, my code is already perfect and cannot possibly be made any better
+
+## TODO's
+- complete documentation
+- once again, all of my work is perfect from the start on
+
+The documentation can be accessed [here](blob/main/DOCUMENTATION.md).
