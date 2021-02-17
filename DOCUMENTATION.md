@@ -1,7 +1,7 @@
 # Documentation
 
 ## overview
-- How to use the SDK
+- [How to use the SDK](#how-to-use-the-sdk)
 - How are HR apps structured
 - Code structure
 - Callbacks
