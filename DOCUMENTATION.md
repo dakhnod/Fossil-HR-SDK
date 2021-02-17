@@ -2,14 +2,14 @@
 
 ## overview
 - [How to use the SDK](#how-to-use-the-sdk)
-- How are HR apps structured
-- Code structure
-- Callbacks
-- Events
-- Api functions
-- State machine
-- Layout
-- Example
+- [How are HR apps structured](#hr-app-structure)
+- [Code structure](#code-structure)
+- [Callbacks](#callbacks)
+- [Events](#events)
+- [Api functions](#api-functions)
+- [State machine](#state-machine)
+- [Layout](#layout)
+- [Example](#example)
 
 ## How to use the SDK
 To use the SDK a few conditions have to be met
