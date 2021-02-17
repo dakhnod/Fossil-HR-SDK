@@ -17,13 +17,14 @@ return {
     title_refers_to_timer: false,
 
     handler: function (event, response) { // function 1
+        this.wrap_event(event)
         this.wrap_response(response)
         this.state_machine._(event, response)
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
     },
-    decode_system_state_update_event: function (system_state_update_event) {
+    wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
             system_state_update_event.concerns_this_app = system_state_update_event.de
             system_state_update_event.old_state = system_state_update_event.ze
@@ -230,7 +231,6 @@ return {
         this.start_timer_tick_timer()
     },
     handle_global_event: function (self, state_machine, event, response) {
-        event = self.decode_system_state_update_event(event)
 
         if (event.type === 'system_state_update' && event.concerns_this_app === true) {
             if (event.new_state === 'visible') {

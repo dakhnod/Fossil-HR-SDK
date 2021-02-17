@@ -35,7 +35,8 @@ return {
 
     moving_direction: 1,
 
-    handler: function (event, response) { // function 1
+    handler: function (event, response) {
+        this.wrap_event(event)
         this.wrap_response(response)
         this.state_machine._(event, response)
     },
@@ -96,7 +97,7 @@ return {
             layout_info
         )
     },
-    decode_system_state_update_event: function (system_state_update_event) {
+    wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
             system_state_update_event.concerns_this_app = system_state_update_event.de
             system_state_update_event.old_state = system_state_update_event.ze
@@ -152,8 +153,6 @@ return {
         this.state_machine = new state_machine(this,
 
             function (self, state_machine, event, response) {
-                event = self.decode_system_state_update_event(event)
-                
                 // if (state_machine.n === 'background') {
                 if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
                     state_machine.d('game_main')

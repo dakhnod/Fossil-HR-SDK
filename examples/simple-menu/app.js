@@ -7,7 +7,8 @@ return {
     config: {},
     selected_option: 0,
 
-    handler: function (event, response) { // function 1
+    handler: function (event, response) {
+        this.wrap_event(event)
         this.wrap_response(response)
         this.state_machine._(event, response)
     },
@@ -33,7 +34,7 @@ return {
             }
         )
     },
-    decode_system_state_update_event: function (system_state_update_event) {
+    wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
             system_state_update_event.concerns_this_app = system_state_update_event.de
             system_state_update_event.old_state = system_state_update_event.ze
@@ -88,7 +89,6 @@ return {
     handle_global_event: function (self, state_machine, event, response) {
         self.log("event type: " + event.type)
         self.log(event)
-        event = self.decode_system_state_update_event(event)
 
         if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
             state_machine.d('menu')
