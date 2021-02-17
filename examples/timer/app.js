@@ -19,7 +19,7 @@ return {
     handler: function (event, response) { // function 1
         this.wrap_event(event)
         this.wrap_response(response)
-        this.state_machine._(event, response)
+        this.state_machine.handle_event(event, response)
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
@@ -83,6 +83,15 @@ return {
             minutes: Math.floor(millis / 60000 % 60),
             hours: Math.floor(millis / 3600000),
         }
+    },
+    wrap_state_machine: function(state_machine) {
+        state_machine.set_current_state = state_machine.d
+        state_machine.handle_event = state_machine._
+        state_machine.get_current_state = function(){
+            return state_machine.n
+        }
+
+        return state_machine
     },
     wrap_response: function (response) {
         response.move_hands = function (degrees_hour, degrees_minute, relative) {
@@ -219,10 +228,10 @@ return {
                 // reset timer
                 this.last_timer_time = this.timer_time
                 this.timer_time = 0
-                if (this.state_machine.n === 'background') {
+                if (this.state_machine.get_current_state() === 'background') {
                     this.state = 'timer_select'
                 } else {
-                    this.state_machine.d('timer_select')
+                    this.state_machine.set_current_state('timer_select')
                 }
                 return
             }
@@ -234,9 +243,9 @@ return {
 
         if (event.type === 'system_state_update' && event.concerns_this_app === true) {
             if (event.new_state === 'visible') {
-                state_machine.d(self.state)
+                state_machine.set_current_state(self.state)
             } else {
-                state_machine.d('background')
+                state_machine.set_current_state('background')
             }
         } else if (event.type === 'middle_hold') {
             response.go_back(self.state === 'timer_select')
@@ -244,8 +253,8 @@ return {
             self.timer_time = self.last_timer_time
             self.timer_start = now()
             self.start_timer_tick_timer()
-            if (state_machine.n !== 'background') {
-                state_machine.d('timer_run')
+            if (state_machine.get_current_state !== 'background') {
+                state_machine.set_current_state('timer_run')
             } else {
                 self.state = 'timer_run'
             }
@@ -285,9 +294,9 @@ return {
                             self.last_displayed_hour = 0
                             if (self.timer_time == 0) {
                                 self.laps.splice(0)
-                                self.state_machine.d('stopwatch_run')
+                                self.state_machine.set_current_state('stopwatch_run')
                             } else {
-                                self.state_machine.d('timer_run')
+                                self.state_machine.set_current_state('timer_run')
                             }
                         } else if (type === 'top_press') {
                             if (self.timer_time > 0) {
@@ -349,7 +358,7 @@ return {
                         type = event.type
                         if (type === 'middle_short_press_release') {
                             stop_timer(self.node_name, 'timer_tick')
-                            state_machine.d('stopwatch_pause')
+                            state_machine.set_current_state('stopwatch_pause')
                         } else if (type === 'timer_expired') {
                             if (is_this_timer_expired(event, self.node_name, 'timer_tick')) {
                                 self.check_timer_time(response)
@@ -396,7 +405,7 @@ return {
                         if (type === 'middle_short_press_release') {
                             stop_timer(self.node_name, 'timer_tick')
                             self.timer_time -= self.timer_time % (60 * 1000)
-                            state_machine.d('timer_select')
+                            state_machine.set_current_state('timer_select')
                         } else if (type === 'timer_expired') {
                             if (is_this_timer_expired(event, self.node_name, 'timer_tick')) {
                                 self.check_timer_time(response)
@@ -441,10 +450,10 @@ return {
                         if (type === 'middle_short_press_release') {
                             self.timer_start = now() - self.stopwatch_time
                             self.start_timer_tick_timer()
-                            self.state_machine.d('stopwatch_run')
+                            self.state_machine.set_current_state('stopwatch_run')
                         } else if (type === 'top_short_press_release' || type == 'bottom_short_press_release') {
                             self.timer_time = 0
-                            self.state_machine.d('timer_select')
+                            self.state_machine.set_current_state('timer_select')
                         }
                     }
                 }
@@ -466,6 +475,7 @@ return {
             undefined,
             'background'
         )
+        this.wrap_state_machine(this.state_machine)
     }
 }
 

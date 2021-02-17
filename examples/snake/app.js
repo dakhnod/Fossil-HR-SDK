@@ -38,7 +38,7 @@ return {
     handler: function (event, response) {
         this.wrap_event(event)
         this.wrap_response(response)
-        this.state_machine._(event, response)
+        this.state_machine.handle_event(event, response)
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
@@ -97,6 +97,15 @@ return {
             layout_info
         )
     },
+    wrap_state_machine: function(state_machine) {
+        state_machine.set_current_state = state_machine.d
+        state_machine.handle_event = state_machine._
+        state_machine.get_current_state = function(){
+            return state_machine.n
+        }
+
+        return state_machine
+    },
     wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
             system_state_update_event.concerns_this_app = system_state_update_event.de
@@ -152,7 +161,7 @@ return {
     handle_global_event: function (self, state_machine, event, response) {
         // if (state_machine.n === 'background') {
         if (event.type === 'system_state_update' && event.concerns_this_app === true && event.new_state === 'visible') {
-            state_machine.d('game_main')
+            state_machine.set_current_state('game_main')
         } else if (event.type === 'middle_hold') {
             response.go_back(true)
         }
@@ -211,6 +220,7 @@ return {
             undefined,
             'background'
         )
+        this.wrap_state_machine(this.state_machine)
     }
 }
 

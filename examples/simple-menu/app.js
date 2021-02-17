@@ -10,7 +10,7 @@ return {
     handler: function (event, response) {
         this.wrap_event(event)
         this.wrap_response(response)
-        this.state_machine._(event, response)
+        this.state_machine.handle_event(event, response)
     },
     log: function (object) {
         req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
@@ -33,6 +33,15 @@ return {
                 options: this.options
             }
         )
+    },
+    wrap_state_machine: function(state_machine) {
+        state_machine.set_current_state = state_machine.d
+        state_machine.handle_event = state_machine._
+        state_machine.get_current_state = function(){
+            return state_machine.n
+        }
+
+        return state_machine
     },
     wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
@@ -154,6 +163,7 @@ return {
             undefined,
             'background'
         )
+        this.wrap_state_machine(this.state_machine)
     }
 }
 
