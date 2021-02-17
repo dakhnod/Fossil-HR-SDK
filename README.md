@@ -19,4 +19,4 @@ this is a collection of tools to create apps that run natively on the the Fossil
 - complete documentation
 - once again, all of my work is perfect from the start on
 
-The documentation can be accessed [here](blob/main/DOCUMENTATION.md).
+The documentation can be accessed [here](DOCUMENTATION.md).
