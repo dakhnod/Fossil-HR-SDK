@@ -96,15 +96,13 @@ return {
             layout_info
         )
     },
-    decode_system_state_update_event: function(system_state_update_event){
-        if(system_state_update_event.type !== 'system_state_update') return system_state_update_event;
-
-        return {
-            type: system_state_update_event.type,
-            concerns_this_app: system_state_update_event.de,
-            old_state: system_state_update_event.ze,
-            new_state: system_state_update_event.le
+    decode_system_state_update_event: function (system_state_update_event) {
+        if (system_state_update_event.type === 'system_state_update') {
+            system_state_update_event.concerns_this_app = system_state_update_event.de
+            system_state_update_event.old_state = system_state_update_event.ze
+            system_state_update_event.new_state = system_state_update_event.le
         }
+        return system_state_update_event
     },
     wrap_response: function (response) {
         response.move_hands = function (degrees_hour, degrees_minute, relative) {
