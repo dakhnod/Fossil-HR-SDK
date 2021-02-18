@@ -1,6 +1,8 @@
-# Fossil-HR-SDK
+# Fossil HR SDK
 
 this is a collection of tools to create apps that run natively on the the Fossil HR smartwatches.
+
+[Timer](https://www.reddit.com/r/FossilHybrids/comments/ld9zc7/better_timer_v2/) and [Snake](https://www.reddit.com/r/FossilHybrids/comments/ldiah1/schnek_on_hr/) are two of the examples in the SDK.
 
 ## Prerequisites
 - the thing probably won't run under windows natively. Subsystem works though.
