@@ -66,6 +66,7 @@ class Unpacker:
         layout_start = self.read_int(4)
         display_name_start = self.read_int(4)
         display_name_start_2 = self.read_int(4)
+        config_start = self.read_int(4)
         file_end = self.read_int(4)
 
         self.file.seek(jerry_start)
@@ -74,7 +75,8 @@ class Unpacker:
             'code': self.read_file_sequence(app_icon_start, False),
             'icons': self.read_file_sequence(layout_start, False),
             'layout': self.read_file_sequence(display_name_start, True),
-            'display_name': self.read_file_sequence(file_end, True),
+            'display_name': self.read_file_sequence(config_start, True),
+            'config': self.read_file_sequence(file_end, True),
         }
 
         identifier = files['code'][0]['filename']
