@@ -27,7 +27,7 @@ class Packer:
         all_files = []
         dir_sizes = {}
 
-        for files_dir_list in [('code', False), ('icons', False), ('layout', True), ('display_name', True)]:
+        for files_dir_list in [('code', False), ('icons', False), ('layout', True), ('display_name', True), ('config', True)]:
             dir_size = 0
             files_dir = files_dir_list[0]
             append_null = files_dir_list[1]
@@ -52,7 +52,8 @@ class Packer:
         offset_icons = offset_code + dir_sizes['code']
         offset_layout = offset_icons + dir_sizes['icons']
         offset_display_name = offset_layout + dir_sizes['layout']
-        offset_file_end = offset_display_name + dir_sizes['display_name']
+        offset_config = offset_display_name + dir_sizes['display_name']
+        offset_file_end = offset_config + dir_sizes['config']
 
         self.file_block.extend([int(octet) for octet in app_meta['version'].split('.')])
 
@@ -63,8 +64,8 @@ class Packer:
         self.put_int(offset_layout)
         self.put_int(offset_display_name)
         self.put_int(offset_display_name)
+        self.put_int(offset_config)
         self.put_int(offset_file_end)
-        self.put_int(0)
         self.put_int(0)
         self.put_int(0)
         self.put_int(0)
