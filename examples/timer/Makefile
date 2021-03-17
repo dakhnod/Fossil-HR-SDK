@@ -15,7 +15,7 @@ all: build push install
 build: compile pack
 
 compile:
-	mkdir -p build/files/code
+	mkdir -p build/files/code build/files/config
 	jerry-snapshot generate -f '' ${source_file} -o ${snapshot_file}
 
 pack:
