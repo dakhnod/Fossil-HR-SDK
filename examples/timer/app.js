@@ -1,3 +1,4 @@
+
 return {
     node_name: '',
     manifest: {
@@ -8,6 +9,7 @@ return {
     timer_start: 0,
     timer_time: 0,
     stopwatch_time: 0,
+    paused_stopwatch_time: 0,
     last_timer_time: 0,
     select_direction: '',
     state: 'timer_select',
@@ -39,11 +41,12 @@ return {
             var time = calculate_func(lap)
             laps_strings.push(localization_snprintf('%.2d:%.2d:%.2d.%.3d', time.hours, time.minutes, time.seconds, time.millis))
         })
-        var time = this.calculate_time(this.calculate_passed_stopwatch_time())
         var title_string
         if (this.state === 'stopwatch_pause') {
+            var time = this.calculate_time(this.paused_stopwatch_time)
             var title_string = localization_snprintf('%.2d:%.2d:%.2d.%.3d', time.hours, time.minutes, time.seconds, time.millis)
         } else {
+            var time = this.calculate_time(this.calculate_passed_stopwatch_time())
             var title_string = localization_snprintf('%d hours', time.hours)
         }
         response.draw_screen(
@@ -437,8 +440,11 @@ return {
             case 'stopwatch_pause': {
                 if (state_phase == 'entry') {
                     return function (self, response) {
+                        if(self.state != 'stopwatch_pause'){
+                            self.paused_stopwatch_time = now() - self.timer_start
+                        }
                         self.state = state
-                        self.stopwatch_time = now() - self.timer_start
+                        self.stopwatch_time = self.paused_stopwatch_time
                         self.display_time_running(response)
                         self.draw_display_stopwatch(response, true)
                         response.move_hands(270, 90, false)
