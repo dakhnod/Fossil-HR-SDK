@@ -33,7 +33,8 @@ class Packer:
             append_null = files_dir_list[1]
             files = os.listdir(files_dir)
             os.chdir(files_dir)
-            for file in files:
+            for file in sorted(files):
+                print(f'packing {file}')
                 with open(file, 'rb')as f:
                     contents = bytearray(f.read())
                     if append_null:
