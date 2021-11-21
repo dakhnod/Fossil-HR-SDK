@@ -407,6 +407,7 @@ return {
                             self.display_alarm_select(response)
                         } else if (type === 'top_hold') {
                             // self.time_select_forward(response)
+                            self.alarm_time -= (self.alarm_time % (5 *  60 * 1000))
                             self.select_direction = 'backward'
                             self.start_forward_timer()
                         } else if (type === 'bottom_press') {
@@ -415,6 +416,7 @@ return {
                             self.display_alarm_select(response)
                         } else if (type === 'bottom_hold') {
                             // self.time_select_forward(response)
+                            self.alarm_time += (5 *  60 * 1000) - (self.alarm_time % (5 *  60 * 1000))
                             self.select_direction = 'forward'
                             self.start_forward_timer()
                         } else if (type === 'timer_expired') {
