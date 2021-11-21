@@ -8,6 +8,7 @@ return {
     config: {},
     timer_start: 0,
     timer_time: 0,
+    alarm_time: 0,
     stopwatch_time: 0,
     paused_stopwatch_time: 0,
     last_timer_time: 0,
@@ -65,6 +66,9 @@ return {
             var time = this.calculate_time(this.calculate_remaining_timer_time())
             var title_string = localization_snprintf('%d hours', time.hours)
             var title_icon = 'icTimer'
+        } else if(this.state === 'alarm_select') {
+            var title_string = 'Better alarm'
+            var title_icon = 'icTimer'
         } else {
             var title_string = this.timer_time === 0 ? 'Better stopwatch' : 'Better timer'
             var title_icon = this.timer_time === 0 ? 'icStopwatch' : 'icTimer'
@@ -95,6 +99,12 @@ return {
         }
 
         return state_machine
+    },
+    get_current_time: function(){
+        return {
+            minute: common.minute,
+            hour: common.hour
+        }
     },
     wrap_response: function (response) {
         response.move_hands = function (degrees_hour, degrees_minute, relative) {
@@ -151,6 +161,13 @@ return {
         if (time.hours > 0) {
             angle_hours = time.hours * 30
         }
+        response.move_hands(angle_hours, angle_mins, false)
+    },
+    display_alarm_select: function (response) {
+        var time = this.calculate_time(this.alarm_time)
+
+        var angle_mins = time.minutes * 6
+        var angle_hours = time.hours * 30 + (time.minutes / 60) * 30
         response.move_hands(angle_hours, angle_mins, false)
     },
     display_time_running: function (response) {
@@ -251,7 +268,7 @@ return {
                 state_machine.set_current_state('background')
             }
         } else if (event.type === 'middle_hold') {
-            response.go_back(self.state === 'timer_select')
+            response.go_back(self.state == 'timer_select' ||  self.state == 'alarm_select')
         } else if (event.type === 'timer_restart') {
             self.timer_time = self.last_timer_time
             self.timer_start = now()
@@ -306,6 +323,9 @@ return {
                                 self.timer_time -= 60 * 1000
                                 if (self.timer_time < 0) self.timer_time = 0
                                 self.display_time_select(response)
+                            }else{
+                                self.state_machine.set_current_state('alarm_select')
+                                return
                             }
                         } else if (type === 'top_hold') {
                             self.timer_time = 0
@@ -338,6 +358,78 @@ return {
                                 self.draw_display_timer(response, false)
                                 self.title_refers_to_timer = title_should_refer_to_timer
                             }
+                        }
+                    }
+                }
+                if (state_phase == 'exit') {
+                    return function (arg, arg2) { // function 14, 20
+
+                    }
+                }
+                break;
+            }
+            case 'alarm_select': {
+                if (state_phase == 'entry') {
+                    return function (self, response) {
+                        self.state = 'alarm_select';
+
+                        var now = self.get_current_time();
+                        self.alarm_time = now.hour % 12 * 3600 + now.minute * 60;
+                        self.alarm_time *= 1000; // convert seconds to millis
+
+                        self.draw_display_timer(response, true)
+                        self.display_alarm_select(response)
+                    }
+                }
+                if (state_phase == 'during') {
+                    return function (self, state_machine, event, response) {
+                        type = event.type
+                        if (type === 'middle_short_press_release') {
+                            self.last_displayed_hour = 0
+                            var now_millis = (get_unix_time() + (common.time_zone_local * 60)) * 1000
+                            now_millis %= 12 * 60 * 60 * 1000
+                            var time_dif = self.alarm_time - now_millis
+                            if(time_dif < 0) time_dif += 12 * 60 * 60 * 1000
+                            self.timer_time = time_dif
+
+                            self.timer_start = now()
+                            self.start_timer_tick_timer()
+                            self.state_machine.set_current_state('timer_run')
+                        } else if (type === 'top_press') {
+                            self.alarm_time -= 60 * 1000
+                            if(self.alarm_time < 0){
+                                self.alarm_time += 12 * 60 * 60 * 1000
+                            }
+                            self.display_alarm_select(response)
+                        } else if (type === 'top_hold') {
+                            // self.time_select_forward(response)
+                            self.select_direction = 'backward'
+                            self.start_forward_timer()
+                        } else if (type === 'bottom_press') {
+                            self.alarm_time += 60 * 1000
+                            self.alarm_time %= 12 * 60 * 60 * 1000
+                            self.display_alarm_select(response)
+                        } else if (type === 'bottom_hold') {
+                            // self.time_select_forward(response)
+                            self.select_direction = 'forward'
+                            self.start_forward_timer()
+                        } else if (type === 'timer_expired') {
+                            if (is_this_timer_expired(event, self.node_name, 'select_tick')) {
+                                if (self.select_direction == 'forward') {
+                                    self.alarm_time += 5 * 60 * 1000
+                                    self.alarm_time %= 12 * 60 * 60 * 1000
+                                }else if(self.select_direction == 'backward') {
+                                    self.alarm_time -= 5 * 60 * 1000
+                                    if(self.alarm_time < 0){
+                                        self.alarm_time += 12 * 60 * 60 * 1000
+                                    }
+                                }
+                                self.display_alarm_select(response)
+                                self.start_forward_timer()
+                            }
+                        } else if (type == 'bottom_long_press_release' || type == 'top_long_press_release') {
+                            self.select_direction = ''
+                            stop_timer(self.node_name, 'select_tick')
                         }
                     }
                 }
