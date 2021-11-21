@@ -159,7 +159,7 @@ return {
         var angle_mins = time.minutes * 6
         var angle_hours = angle_mins
         if (time.hours > 0) {
-            angle_hours = time.hours * 30
+            angle_hours = time.hours * 30 + (time.minutes / 60) * 30
         }
         response.move_hands(angle_hours, angle_mins, false)
     },
