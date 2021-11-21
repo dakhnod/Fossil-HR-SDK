@@ -201,7 +201,7 @@ return {
                 vibe: {
                     type: 'timer',
                     Te: 1500,
-                    Ie: 6000
+                    Ie: 60000
                 },
                 exit_event: {
                     type: 'timer_dismiss'
