@@ -24,8 +24,12 @@ return {
         this.wrap_response(response)
         this.state_machine.handle_event(event, response)
     },
-    log: function (object) {
-        req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
+    log: function (object, tag) {
+        if(tag === undefined){
+            req_data(this.node_name, '"type": "log", "node":"' + this.node_name + '", "tag":"", "data":' + JSON.stringify(object), 999999, true)
+        }else{
+            req_data(this.node_name, '"type": "log", "node":"' + this.node_name + '", "tag":"' + tag +  '", "data":' + JSON.stringify(object), 999999, true)
+        }
     },
     wrap_event: function (system_state_update_event) {
         if (system_state_update_event.type === 'system_state_update') {
@@ -391,7 +395,7 @@ return {
                             var time_dif = self.alarm_time - now_millis
                             if(time_dif < 0) time_dif += 12 * 60 * 60 * 1000
                             self.timer_time = time_dif
-
+                            
                             self.timer_start = now()
                             self.start_timer_tick_timer()
                             self.state_machine.set_current_state('timer_run')

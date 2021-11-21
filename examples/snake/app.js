@@ -40,8 +40,12 @@ return {
         this.wrap_response(response)
         this.state_machine.handle_event(event, response)
     },
-    log: function (object) {
-        req_data(this.node_name, '"type": "log", "data":' + JSON.stringify(object), 999999, true)
+    log: function (object, tag) {
+        if(tag === undefined){
+            req_data(this.node_name, '"type": "log", "node":"' + this.node_name + '", "tag":"", "data":' + JSON.stringify(object), 999999, true)
+        }else{
+            req_data(this.node_name, '"type": "log", "node":"' + this.node_name + '", "tag":"' + tag +  '", "data":' + JSON.stringify(object), 999999, true)
+        }
     },
 
     calculate_game: function () {
