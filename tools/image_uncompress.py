@@ -10,7 +10,7 @@ class Decompresser:
     def decompress(self, input_file_path, output_file_path):
         image_pixels = []
 
-        if not os.path.isfile(sys.argv[1]):
+        if not os.path.isfile(input_file_path):
             raise Exception('first parameter needs to be compressed image file')
 
         with open(input_file_path, 'rb') as image_file:
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     decompresser = Decompresser()
     input_file_path = None
     output_file_path = None
-    args, remainder = getopt.getopt(sys.argv[1], 'i:o:', ['input=', 'output='])
+    args, remainder = getopt.getopt(sys.argv[1:], 'i:o:', ['input=', 'output='])
     for key, value in args:
         if key in ['-i', '--input']:
             input_file_path = value
