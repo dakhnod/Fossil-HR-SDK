@@ -7,7 +7,8 @@ package_file := ${identifier}.wapp
 package_path := build/${package_file}
 
 adb_target := 192.168.0.192:5555
-adb_target_dir := /sdcard/${package_file}
+adb_target_dir := /sdcard/q
+adb_target_file := ${adb_target_dir}/${package_file}
 
 .PHONY: all build compile pack push connect install clean
 
@@ -22,7 +23,8 @@ pack:
 	python3 ${tools_dir}tools/pack.py -i build/ -o ${package_path}
 
 push:
-	adb push ${package_path} ${adb_target_dir}
+	adb shell mkdir -p ${adb_target_dir} 
+	adb push ${package_path} ${adb_target_file}
 
 connect:
 	adb connect ${adb_target}
@@ -31,7 +33,7 @@ install:
 	adb shell am broadcast \
     -a "nodomain.freeyourgadget.gadgetbridge.Q_UPLOAD_FILE" \
     --es EXTRA_HANDLE APP_CODE \
-    --es EXTRA_PATH "${adb_target_dir}" \
+    --es EXTRA_PATH "${adb_target_file}" \
 	--ez EXTRA_GENERATE_FILE_HEADER false
 
 clean:
