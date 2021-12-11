@@ -187,7 +187,7 @@ return {
         if (time.minutes === 0) {
             angle_hours = angle_mins
         } else {
-            angle_hours = time.minutes * 6
+            angle_hours = time.minutes * 6 + (time.seconds / 60) * 6
         }
         response.move_hands(angle_hours, angle_mins, false)
     },
