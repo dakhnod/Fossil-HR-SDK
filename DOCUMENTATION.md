@@ -164,8 +164,30 @@ parameters:
 ### parseInt(arg)
 dunno, might not even be a function
 
-### save_node_persist(persist_data)
-persistenly save given data. Dunno about the format, maybe just any arbitary object.
+### save_node_persist(node_name)
+Each application is an Object.
+For persistence to work, the object needs to have a persist field.
+[Here](https://github.com/dakhnod/Fossil-HR-Timer/blob/3e031eaa5c85a8bab91bbc02515f50f74b95185a/app.js#L7) is an example.
+When calling ```save_node_persist(node_name)```, the OS reads the objects persist.data contents, that contain the fields to be persisted.
+Let's say our application looks like this:
+```
+return {
+    node_name: '',
+    persist: {
+        version: 1,
+        data: ['distance', 'names']
+    },
+    distance: 0.7,
+    names: [
+        'Daniel',
+        'James'
+    ],
+    ...
+}
+```
+When we then call ```save_node_persist(self.node_name)```, the OS reads the value of distance and names, and stores them.
+Next time our application is started and the OS finds those values stored it will assign them in out application.
+My [timer](https://github.com/dakhnod/Fossil-HR-Timer/blob/master/app.js) app is a working example of this.
 
 ### localization_snprintf()
 translates the input according to the installed translation file.
