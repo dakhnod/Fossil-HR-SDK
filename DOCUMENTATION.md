@@ -390,24 +390,24 @@ layouts are build hirachically using a JSON definition in a file.
 Each node has an id a type, a position, dimensions and a parent container id (besides node 0).
 
 These are some (probably) common fields:
-    - id
-    - parent_id
+- id
+- parent_id
+- type
+- dimension
     - type
-    - dimension
-        - type
-            - no clue, mostly set to "rigid"
-        - width
-        - height
-    - placement
-        - type
-            - whatever, set to "absolute"
-        - left
-            - space to lef
-        - top
-            - space to top
-    - visible
-    - inversion
-        - no clue, someone help me out pls
+        - no clue, mostly set to "rigid"
+    - width
+    - height
+- placement
+    - type
+        - whatever, set to "absolute"
+    - left
+        - space to lef
+    - top
+        - space to top
+- visible
+- inversion
+    - no clue, someone help me out pls
 
 Here are the so far known types:
 - wapp_template
