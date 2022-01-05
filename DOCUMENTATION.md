@@ -406,6 +406,50 @@ Here are the so far known types:
         - number of the selected option
     - is_translate
         - wtf
+- container
+    - direction
+        - probably the orientation, no idea what different values mean
+- text
+    - text
+        - this field contains the text displayed
+    - ppem
+        - the text size in points per m, whatever that means
+    - ascent
+        - what
+    - descent
+        - what
+    - color
+        - a value between 0 and 3, white and black
+- text_page
+    - text
+        - the text displayed
+    - line_width
+        - an array with three values, probably the width of each text line
+    - page_index
+        - what
+    - ppem
+        - text size
+    - ascent
+        - what
+    - descent
+        - what
+    - justify
+        - what
+- image
+    - image_name
+        - the filename of the image to display
+    - draw_mode
+        - no idea what that means
+- solid
+    - color
+        - well, the color of the solid block, between 0 and 3
+- content_table
+    - contents
+        - contains object with the entries, in this form:
+            - icon
+                - the icon of the entry
+            - text_low
+                - the label of the entry
 
 ## Example
 Examples can be found in the examples folder. Too learn about running examples theck the `How to use the SDK` section.
