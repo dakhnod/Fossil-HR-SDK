@@ -430,7 +430,18 @@ Here are the so far known types:
         - wtf
 - container
     - direction
-        - probably the orientation, no idea what different values mean
+        - 0 = horizontal
+        - 1 = vertical
+    - main_alignment
+        - vertical alignment
+        - 0 = align top
+        - 1 = align center
+        - 2 = align bottom
+    - cross_alignment
+        - horizontal alignment
+        - 0 = align left
+        - 1 = align center
+        - 2 = align right
 - text
     - text
         - this field contains the text displayed
