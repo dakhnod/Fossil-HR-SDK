@@ -9,7 +9,7 @@ this is a collection of tools to create apps that run natively on the the Fossil
 - jerryscript and jerryscript-snapshot need to be installed and in the $PATH, both v2.1.0
 - make needs to be installed
 - adb needs to be working and connected to your phone
-- Gadgetbridge needs to run on the phone and be connected to the watch (not authentication needed)
+- Gadgetbridge needs to run on the phone and be connected to the watch (no authentication needed)
 - some more stuff, dunno what yet. You and me can complete this together...
 
 ## Usage
