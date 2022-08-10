@@ -13,9 +13,14 @@
 
 ## How to use the SDK
 To use the SDK a few conditions have to be met
-- JerryScript v2.1.0 needs to be installed
-- jerry-snapshot needs to be in $PATH
-- jq needs to be installed and executable
+- JerryScript v2.1.0 needs to be built with:
+```
+python3 tools/build.py --jerry-cmdline-snapshot ON
+```
+
+- `jerry-snapshot` needs to be in `$PATH`
+- `pip3 install crc32c`
+- `jq` needs to be installed and executable
 - for pushing and installing via Makefile:
     - adb needs to be installed
     - if phone supports adb over wifi, `make connect` can be used after adjusting the Makefile
