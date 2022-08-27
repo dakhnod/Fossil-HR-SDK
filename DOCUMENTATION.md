@@ -256,8 +256,11 @@ Should contain these fields:
 - hr_bpm_resting
 - hr_bpm_peak
 
-### now()
-returns the current time in milliseconds.
+### `now()`
+returns the current time in integer milliseconds since boot.
+
+### `get_unix_time()`
+returns integer seconds since the Unix epoch (1970-01-01T00:00)
 
 ### is_this_timer_expired(event, node_name, timer_name)
 check if a timer is expired based on a `timer_expired`-event.
