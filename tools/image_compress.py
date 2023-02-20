@@ -6,14 +6,11 @@ def compress_rle(input, width, height, output,**_):
 
     image = Image.open(input)
 
-    if image.mode != 'RGBA':
-        raise Exception('image bands have to be RGBA')
+    if image.mode != 'RGBA' and image.mode != 'RGB':
+        raise Exception('image bands have to be RGB or RGBA')
 
     width = width or image.width
     height = height or image.height
-
-    if width != height:
-        raise Exception('image must be square for raw compression')
 
     if width != image.width or height != image.height:
         image = image.resize((width, height),resample=Image.Resampling.NEAREST)
@@ -27,7 +24,9 @@ def compress_rle(input, width, height, output,**_):
 
             pixelRGBA = image.getpixel((x, y))
             grey = int((pixelRGBA[0] + pixelRGBA[1] + pixelRGBA[2]) / 3) & 0xc0
-            alpha = ~(pixelRGBA[3]) & 0xc0
+            alpha = 0xc0
+            if len(pixelRGBA) > 3:
+                alpha = ~(pixelRGBA[3]) & 0xc0
             pixel = (grey >> 6) | (alpha >> 4)
 
             if last_pixel is None:
@@ -55,6 +54,9 @@ def compress_raw(input, width, height, output, **_):
 
     width = width or image.width
     height = height or image.height
+
+    if width != height:
+        raise Exception('image must be square for raw compression')
 
     if width != image.width or height != image.height:
         image = image.resize((width, height),resample=Image.Resampling.NEAREST)

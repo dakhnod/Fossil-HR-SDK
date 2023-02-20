@@ -2,6 +2,10 @@ from PIL import Image
 from math import isqrt
 import argparse
 
+# scaling 2 bits to 8 bits, 0 => 0, ... , 0b11 => 0xFF
+def bitscale2to8(c):
+    return 0x55 * (c & 3)
+
 
 def decompressRaw(input, output, **_):
 
@@ -13,7 +17,7 @@ def decompressRaw(input, output, **_):
             size += 1
             for _a in range(4):
                 for _b in range(3):
-                    yield b & 0xc0
+                    yield bitscale2to8(b >> 6)
                 b <<= 2
 
     pixels = bytes(rawEncoder())
@@ -44,8 +48,9 @@ def decompress(input, output, **_):
         while r := input.read(2):   # read is buffered so no optimization is needed
 
             if rep is not None:
-                color = (byte << 6) & 0xc0
-                alpha = ~(byte << 4) & 0xc0
+
+                color = bitscale2to8(byte)
+                alpha = bitscale2to8(~(byte >> 2))
                 image_pixels.extend([color, color, color, alpha] * rep)
 
             (rep, byte) = r     # can throw ValueError
