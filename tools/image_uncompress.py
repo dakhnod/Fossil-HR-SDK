@@ -1,56 +1,98 @@
 from PIL import Image
-import sys
-import os.path
-import getopt
+from math import isqrt
+import argparse
 
-class Decompresser:
-    def __init__(self):
-        pass
+# scaling 2 bits to 8 bits, 0 => 0, ... , 0b11 => 0xFF
+def bitscale2to8(c):
+    return 0x55 * (c & 3)
 
-    def decompress(self, input_file_path, output_file_path):
-        image_pixels = []
 
-        if not os.path.isfile(input_file_path):
-            raise Exception('first parameter needs to be compressed image file')
+def decompressRaw(input, output, **_):
 
-        with open(input_file_path, 'rb') as image_file:
-            width = image_file.read(1)[0]
-            height = image_file.read(1)[0]
+    size = 0
+    def rawEncoder():
+        nonlocal input,size
+        while b := input.read(1):     # read is buffered so no optimization is needed
+            b = b[0]
+            size += 1
+            for _a in range(4):
+                for _b in range(3):
+                    yield bitscale2to8(b >> 6)
+                b <<= 2
 
-            print('final image size: %dx%d' % (width, height))
+    pixels = bytes(rawEncoder())
 
-            image_file.seek(0, 2)
+    w = isqrt(size)
+    if w*w != size:
+        print("Faulty image file - wrong file size")
+        exit(1)
 
-            image_data_end = image_file.tell() - 2
+    w <<= 1     # 4 pixels per byte, squared
+    print(f'final image size: {w}x{w}')
 
-            image_file.seek(2)
+    image = Image.frombuffer('RGB', (w, w), pixels)
+    image.transpose(Image.Transpose.ROTATE_180).save(output, 'PNG')
 
-            while image_file.tell() < image_data_end:
-                repititions = image_file.read(1)[0]
-                byte = image_file.read(1)[0]
+def decompress(input, output, **_):
 
-                color = (byte << 6) & 0b11000000
-                alpha = ~(byte << 4) & 0b11000000
+    try:
 
-                image_pixels.extend([color, color, color, alpha] * repititions)
+        (width,height) = input.read(2)      # can throw ValueError
 
-            if image_file.read(2) != b'\xFF\xFF':
-                print('faulty image file, missing 0xFF 0xFF at end')
+        print(f'final image size: {width}x{height}')
 
-        image = Image.frombuffer('RGBA', (width, height), bytearray(image_pixels))
-        image.save(output_file_path, 'PNG')
+        image_pixels = bytearray()
+        rep = None
+        byte = None
+
+        while r := input.read(2):   # read is buffered so no optimization is needed
+
+            if rep is not None:
+
+                color = bitscale2to8(byte)
+                alpha = bitscale2to8(~(byte >> 2))
+                image_pixels.extend([color, color, color, alpha] * rep)
+
+            (rep, byte) = r     # can throw ValueError
+
+    except ValueError:
+        print("Faulty image file - wrong file size")
+        exit(1)
+
+    if rep != 0xFF or byte != 0xFF:
+        print('Faulty image file, missing 0xFF 0xFF at end')
+
+    image = Image.frombuffer('RGBA', (width, height), image_pixels)
+    image.save(output, 'PNG')
+
+def main():
+
+    optParser = argparse.ArgumentParser(description="Convert image from Fossil Hybrid format to PNG")
+
+    optParser.add_argument(
+        "-i","--input",
+        required=True,
+        type=argparse.FileType('rb'),
+        help="Input file")
+    optParser.add_argument(
+        "-f","--iformat",
+        required=False,
+        default="rle",
+        choices=['rle','raw'],
+        help="Format of the input image, default: rle")
+    optParser.add_argument(
+        "-o","--output",
+        required=True,
+        type=argparse.FileType('wb'),
+        help="Output file")
+
+    args = optParser.parse_args()
+
+    if args.iformat == 'rle':
+        decompress(**vars(args))
+    else:
+        decompressRaw(**vars(args))
 
 
 if __name__ == '__main__':
-    decompresser = Decompresser()
-    input_file_path = None
-    output_file_path = None
-    args, remainder = getopt.getopt(sys.argv[1:], 'i:o:', ['input=', 'output='])
-    for key, value in args:
-        if key in ['-i', '--input']:
-            input_file_path = value
-        elif key in ['-o', '--output']:
-            output_file_path = value
-
-    decompresser.decompress(input_file_path, output_file_path)
-
+    main()

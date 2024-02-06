@@ -1,136 +1,133 @@
-import sys
-import getopt
+
+import argparse
 from PIL import Image
 
+def compress_rle(input, width, height, output,**_):
 
-class Image_compresser:
-    def __init__(self):
-        pass
+    image = Image.open(input)
 
-    def rle_encode(self, raw_bytes):
-        output = bytearray()
-        last_byte = raw_bytes[0]
-        current_count = 1
-        current_byte = -1
+    if image.mode != 'RGBA' and image.mode != 'RGB':
+        raise Exception('image bands have to be RGB or RGBA')
 
-        for i in range(1, raw_bytes.__len__()):
-            current_byte = raw_bytes[i]
+    width = width or image.width
+    height = height or image.height
 
-            if current_byte != last_byte or current_count >= 255:
-                output.append(current_count)
-                output.append(raw_bytes[i - 1])
-                current_count = 1
-                last_byte = raw_bytes[i]
+    if width != image.width or height != image.height:
+        image = image.resize((width, height),resample=Image.Resampling.NEAREST)
+
+    outputBuf = bytearray()
+    last_pixel = None
+    count = 1
+
+    for y in range(0, height):
+        for x in range(0, width):
+
+            pixelRGBA = image.getpixel((x, y))
+            grey = int((pixelRGBA[0] + pixelRGBA[1] + pixelRGBA[2]) / 3) & 0xc0
+            alpha = 0xc0
+            if len(pixelRGBA) > 3:
+                alpha = ~(pixelRGBA[3]) & 0xc0
+            pixel = (grey >> 6) | (alpha >> 4)
+
+            if last_pixel is None:
+                last_pixel = pixel
+            elif last_pixel == pixel and count < 255:
+                count += 1
             else:
-                current_count += 1
+                outputBuf.extend([count,last_pixel])
+                last_pixel = pixel
+                count = 1
 
-        output.append(current_count)
-        output.append(current_byte)
+    outputBuf.extend([count,last_pixel])
 
-        return output
-
-    def compress_rle(self, input_file, width, height, output_file):
-        image = Image.open(input_file)
-        if image.getbands() != tuple(['R', 'G', 'B', 'A']):
-            raise Exception('image bands have to be RGBA')
-        image = image.resize((width, height))
-        pixels = bytearray()
-        for y in range(0, height):
-            for x in range(0, width):
-                pixel = image.getpixel((x, y))
-                grey = (pixel[0] + pixel[1] + pixel[2]) / 3
-                pixel_bits = (int(grey) & 0xFF) >> 6
-                pixel_bits |= (~(pixel[3]) >> 4) & 0b00001100
-                pixels.append(pixel_bits)
-
-        compressed = self.rle_encode(pixels)
-        output = bytearray()
-        output.append(width)
-        output.append(height)
-        output.extend(compressed)
-        output.extend([0xFF, 0xFF])
-
-        with open(output_file, 'wb') as output_file:
-            output_file.write(output)
-
-    def compress_raw(self, input_file, width, height, output_file):
-        image = Image.open(input_file)
-        pixels = bytearray(width * height)
-        jumpX = image.width / width
-        jumpY = image.height / height
-
-        for y in range(0, height):
-            for x in range(0, width):
-                pixel = image.getpixel((x * jumpX, y * jumpY))
-                grey = (pixel[0] + pixel[1] + pixel[2]) / 3
-                pixels[len(pixels) - 1 - (y * width + x)] = int(grey)
-
-        output = bytearray(int(len(pixels) / 4))
-        for i in range(0, len(pixels)):
-            resultPixelIndex = int(i / 4)
-            shiftIndex = 6 - i % 4 * 2
-            output[resultPixelIndex] |= ((int(pixels[i]) & 0xFF) >> 6) << shiftIndex
-
-        with open(output_file, 'wb') as output_file:
-            output_file.write(output)
+    output.write(bytes([width,height]))
+    output.write(outputBuf)
+    output.write(bytes([0xFF,0xFF]))
 
 
-def usage():
-    print('Usage: ' + sys.argv[0] + ' [options]')
-    print('Available options are:')
-    print('  -i,  --input=FILE      input file (RGBA PNG)')
-    print('  -o,  --output=FILE     output file')
-    print('  -w,  --width=PIXELS    width of the output image in pixels')
-    print('  -h,  --height=PIXELS   height of the output image in pixels')
-    print('  -f,  --format=FORMAT   format of the output image (rle or raw)')
+def compress_raw(input, width, height, output, **_):
+
+    image = Image.open(input)
+
+    if image.mode != 'RGBA' and image.mode != 'RGB':
+        raise Exception('image bands have to be RGB or RGBA')
+
+    width = width or image.width
+    height = height or image.height
+
+    if width != height:
+        raise Exception('image must be square for raw compression')
+
+    if width != image.width or height != image.height:
+        image = image.resize((width, height),resample=Image.Resampling.NEAREST)
+
+    outputBuf = bytearray()
+    shiftCounter = 0
+    shiftReg = 0
+
+    for y in reversed(range(0, height)):
+        for x in reversed(range(0, width)):
+
+            pixel = image.getpixel((x, y))
+            grey = int((pixel[0] + pixel[1] + pixel[2]) / 3) & 0xc0
+
+            shiftReg |= grey >> shiftCounter
+
+            if (shiftCounter == 6):
+                outputBuf.append(shiftReg)
+                shiftReg = 0
+                shiftCounter = 0
+            else:
+                shiftCounter += 2
+
+    if (shiftCounter != 0):
+        outputBuf.append(shiftReg)
+
+    output.write(outputBuf)
 
 def main():
-    input_file = None
-    output_file = None
-    width = -1
-    height = -1
-    output_format = None
 
-    if len(sys.argv) < 11:
-        usage()
-        sys.exit(2)
+    optParser = argparse.ArgumentParser(description="Convert image to Fossil Hybrid format",add_help=False)
 
-    try:
-        options, remainder = getopt.getopt(sys.argv[1:], 'i:w:h:o:f:', ['input=', 'width=', 'height=', 'output=', 'format='])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
+    optParser.add_argument(
+        "-i","--input",
+        required=True,
+        type=argparse.FileType('rb'),
+        help="Input file (RGBA PNG)")
+    optParser.add_argument(
+        "-o","--output",
+        required=True,
+        type=argparse.FileType('wb'),
+        help="Output file")
+    optParser.add_argument(
+        "-f","--format",
+        required=False,
+        default="rle",
+        choices=['rle','raw'],
+        help="Format of the output image, default: rle")
+    optParser.add_argument(
+        "-w","--width",
+        required=False,
+        type=int,
+        help="Optional: width of the output image in pixels")
+    optParser.add_argument(
+        "-h","--height",
+        required=False,
+        type=int,
+        help="Optional: height of the output image in pixels")
+    optParser.add_argument(
+        "--help",
+        default=argparse.SUPPRESS,
+        action="help",
+        help="show this help message and exit")
 
-    for key, value in options:
-        if key in ['-i', '--input']:
-            input_file = value
-        elif key in ['-o', '--output']:
-            output_file = value
-        elif key in ['-w', '--width']:
-            width = int(value)
-        elif key in ['-h', '--height']:
-            height = int(value)
-        elif key in ['-f', '--format']:
-            output_format = value
-            if output_format not in ['rle', 'raw']:
-                usage()
-                sys.exit(2)
+    args = optParser.parse_args()
 
-    compresser = Image_compresser()
-    if output_format == 'rle':
-        compresser.compress_rle(
-            input_file,
-            width,
-            height,
-            output_file
-        )
-    elif output_format == 'raw':
-        compresser.compress_raw(
-            input_file,
-            width,
-            height,
-            output_file
-        )
+    if args.format == 'rle':
+        compress_rle(**vars(args))
+    elif args.format == 'raw':
+        compress_raw(**vars(args))
+
 
 
 if __name__ == '__main__':
